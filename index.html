@@ -88,6 +88,7 @@ select{font:inherit;font-size:.9rem;background:var(--card2);color:var(--fg);bord
 .qno{font:700 .85rem var(--mono);background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:4px 10px;white-space:nowrap}
 .prog{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:14px}
 .prog i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.tag.upd{background:#f59e0b;color:#1f2937;font-weight:700}.updnote{margin-top:10px;padding:8px 10px;border-left:3px solid #f59e0b;background:rgba(245,158,11,.12);border-radius:6px;font-size:.85rem}
 .stem{font-size:1.05rem;font-weight:500;margin:0 0 14px;line-height:1.6}
 .figs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:0 0 14px}
 .fig{border:1px solid var(--line);border-radius:10px;background:#000;padding:0;overflow:hidden;position:relative}
@@ -181,7 +182,7 @@ let S={hist:{},flags:{},streak:0,best:0};
 try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r));}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 let cfg={count:20,src:'all',diff:'all',mode:'tutor',order:'bp',status:'all',topics:new Set(Object.keys(TOPIC))};
-try{const c=JSON.parse(localStorage.getItem(KEY+'_cfg')||'null');if(c){Object.assign(cfg,c);cfg.topics=new Set(c.topics);if(!['all','img','txt'].includes(cfg.src))cfg.src='all'}}catch(e){}
+try{const c=JSON.parse(localStorage.getItem(KEY+'_cfg')||'null');if(c){Object.assign(cfg,c);cfg.topics=new Set(c.topics);if(!['all','img','txt','upd'].includes(cfg.src))cfg.src='all'}}catch(e){}
 function saveCfg(){try{localStorage.setItem(KEY+'_cfg',JSON.stringify({...cfg,topics:[...cfg.topics]}))}catch(e){}}
 let sess=null,timerId=null;
 const $=id=>document.getElementById(id);
@@ -201,7 +202,7 @@ function weakTopics(){return Object.keys(TOPIC).map(k=>[k,topicStat(k)]).filter(
 function pool(over){
   const c=Object.assign({},cfg,over||{});
   let p=ORDERED.filter(x=>c.topics.has(x.t));
-  if(c.src==='img')p=p.filter(x=>x.img);else if(c.src==='txt')p=p.filter(x=>!x.img);
+  if(c.src==='upd')p=p.filter(x=>x.upd);else if(c.src==='img')p=p.filter(x=>x.img);else if(c.src==='txt')p=p.filter(x=>!x.img);
   if(c.diff!=='all')p=p.filter(x=>x.d===+c.diff);
   if(c.status==='new')p=p.filter(x=>!S.hist[x.id]);
   else if(c.status==='wrong')p=p.filter(x=>S.hist[x.id]&&!S.hist[x.id].c);
@@ -224,7 +225,7 @@ function home(){
    <div class="sec"><h2>Mode</h2>${pills('mode',[['tutor','Tutor'],['exam','Timed exam']],cfg.mode)}<p class="note" style="margin:8px 0 0">${cfg.mode==='tutor'?'Answer and Focus shown after each question.':'81 s per question (NBE pace); review at the end.'}</p></div>
    <div class="sec"><h2>Difficulty</h2>${pills('diff',[['all','All'],[1,'Easy'],[2,'Medium'],[3,'Hard']],cfg.diff)}</div>
    <div class="sec"><h2>Order</h2>${pills('order',[['bp','Blueprint'],['rnd','Random']],cfg.order)}</div>
-   <div class="sec"><h2>Question type</h2>${pills('src',[['all','All'],['img','With images'],['txt','Text only']],cfg.src)}</div>
+   <div class="sec"><h2>Question type</h2>${pills('src',[['all','All'],['img','With images'],['txt','Text only'],['upd','✎ Updated']],cfg.src)}</div>
    <div class="sec"><h2>Status</h2><select id="fStatus" aria-label="Question status">
      ${[['all','All questions'],['new','Unanswered only'],['wrong','Previously wrong'],['flag','Flagged']].map(([v,l])=>`<option value="${v}" ${cfg.status===v?'selected':''}>${l}</option>`).join('')}</select></div>
   </div>
@@ -275,7 +276,7 @@ function figs(list,id,lettered){return list.length?'<div class="figs">'+list.map
 function renderQ(){
   const x=sess.list[sess.idx],T=TOPIC[x.t],a=sess.ans[x.id],reveal=(sess.mode==='tutor'&&a!==undefined)||sess.done,last=sess.idx===sess.list.length-1;
   const answered=Object.keys(sess.ans).length;
-  let h=`<div class="card"><div class="qtop"><div class="tags"><span class="tag">${esc(T.n)}</span><span class="tag n">#${x.tn} of ${TN[x.t]}</span><span class="tag d${x.d}">${['','Easy','Medium','Hard'][x.d]}</span>${x.img?'<span class="tag n">Figure</span>':''}</div>
+  let h=`<div class="card"><div class="qtop"><div class="tags"><span class="tag">${esc(T.n)}</span><span class="tag n">#${x.tn} of ${TN[x.t]}</span><span class="tag d${x.d}">${['','Easy','Medium','Hard'][x.d]}</span>${x.img?'<span class="tag n">Figure</span>':''}${x.upd?'<span class="tag upd">✎ Updated Oct 2026</span>':''}</div>
    <div class="actions" style="gap:10px">${sess.mode==='exam'&&!sess.done?'<span class="timer" id="timer"></span>':''}<span class="qno">Q${sess.idx+1}/${sess.list.length}</span></div></div>
    <div class="prog" aria-hidden="true"><i style="width:${100*answered/sess.list.length}%"></i></div>
    <p class="stem">${esc(x.stem)}</p>${figs(x.fq,x.id,OPTFIG.has(x.id))}
@@ -283,7 +284,7 @@ function renderQ(){
   x.opts.forEach((o,i)=>{let c='opt';if(reveal){if(i===x.ans)c+=' right';else if(i===a)c+=' wrong'}else if(i===a)c+=' sel';
     h+=`<button class="${c}" data-i="${i}" ${reveal?'disabled':''}><span class="k">${LT[i]}</span><span>${esc(o)}</span></button>`});
   h+='</div>';
-  if(reveal){const ok=a===x.ans;h+=`<div class="focus"><h3>Focus</h3><div class="v ${a===undefined?'':ok?'ok':'no'}">${a===undefined?'Not answered':ok?'Correct':'Incorrect'} · Answer ${LT[x.ans]}${ok&&sess.mode==='tutor'&&S.streak>=3?` <span class="streakpop">· ${S.streak} in a row</span>`:''}</div><p>${esc(x.exp)}</p>${figs(x.fe,x.id,false).replace('class="figs"','class="figs" style="margin:12px 0 0"')}</div>`}
+  if(reveal){const ok=a===x.ans;h+=`<div class="focus"><h3>Focus</h3><div class="v ${a===undefined?'':ok?'ok':'no'}">${a===undefined?'Not answered':ok?'Correct':'Incorrect'} · Answer ${LT[x.ans]}${ok&&sess.mode==='tutor'&&S.streak>=3?` <span class="streakpop">· ${S.streak} in a row</span>`:''}</div><p>${esc(x.exp)}</p>${x.upd?'<div class="updnote">✎ This question was reviewed and corrected in Oct 2026 against current ASE/EACVI guidance.</div>':''}${figs(x.fe,x.id,false).replace('class="figs"','class="figs" style="margin:12px 0 0"')}</div>`}
   h+=`<div class="nav"><div class="actions"><button class="btn" id="prev" ${sess.idx?'':'disabled'}>← Prev</button><button class="btn" id="flag" aria-pressed="${!!S.flags[x.id]}">${S.flags[x.id]?'Flagged':'Flag'}</button></div>
    <div class="actions">${sess.done?'<button class="btn" id="toRes">Results</button>':'<button class="btn" id="end">End</button>'}<button class="btn pri" id="next" ${last&&sess.done?'disabled':''}>${last?(sess.done?'Last':'Finish'):'Next →'}</button></div></div>`;
   h+='<div class="pal" aria-label="Question navigator">'+sess.list.map((q,i)=>{let c='';const aa=sess.ans[q.id];if(aa!==undefined)c=(sess.mode==='tutor'||sess.done)?(aa===q.ans?'ok':'no'):'a';if(i===sess.idx)c+=' cur';if(S.flags[q.id])c+=' f';return `<button class="${c}" data-j="${i}" aria-label="Question ${i+1}">${i+1}</button>`}).join('')+'</div></div>';
