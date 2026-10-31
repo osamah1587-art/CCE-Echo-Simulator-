@@ -88,7 +88,7 @@ select{font:inherit;font-size:.9rem;background:var(--card2);color:var(--fg);bord
 .qno{font:700 .85rem var(--mono);background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:4px 10px;white-space:nowrap}
 .prog{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:14px}
 .prog i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
-.fig .vs{left:auto;right:6px;top:6px;bottom:auto;background:#b45309}.clip{margin:0 0 14px;padding:10px 12px;border:1px dashed var(--accent);border-radius:10px;background:var(--glow);font-size:.92rem}.clip b{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);margin-bottom:2px}
+.fig .vs{left:auto;right:6px;top:6px;bottom:auto;background:#b45309}.fig .vs.ok{background:#047857}.fig video{display:block;width:100%;height:170px;object-fit:contain;background:#000}.lb video{max-width:100%;max-height:92vh;border-radius:8px}.clip{margin:0 0 14px;padding:10px 12px;border:1px dashed var(--accent);border-radius:10px;background:var(--glow);font-size:.92rem}.clip b{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);margin-bottom:2px}
 .tag.upd{background:#f59e0b;color:#1f2937;font-weight:700}.updnote{margin-top:10px;padding:8px 10px;border-left:3px solid #f59e0b;background:rgba(245,158,11,.12);border-radius:6px;font-size:.85rem}
 .stem{font-size:1.05rem;font-weight:500;margin:0 0 14px;line-height:1.6}
 .figs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:0 0 14px}
@@ -157,7 +157,7 @@ td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-
   </div>
   <main id="app"></main>
 </div>
-<div class="lb" id="lb" hidden role="dialog" aria-label="Enlarged figure"><img id="lbImg" alt="Enlarged figure"></div>
+<div class="lb" id="lb" hidden role="dialog" aria-label="Enlarged figure"><img id="lbImg" alt="Enlarged figure"><video id="lbVid" autoplay loop muted playsinline controls hidden></video></div>
 <div class="ticker" aria-hidden="true"><div class="tr" id="tk"></div></div>
 <script src="data.js"></script>
 <script src="teach.js"></script>
@@ -276,14 +276,14 @@ function choose(a){
   else{if(sess.done)return;sess.ans[x.id]=a}
   renderQ();
 }
-function figs(list,id,lettered){return list.length?'<div class="figs">'+list.map((f,i)=>`<button class="fig" data-src="${f}"><img src="${f}" loading="lazy" alt="Figure ${i+1} for question ${id}"><span>${lettered?'Option '+LT[i]:'Fig '+(i+1)}</span>${(typeof VIDSTILL!=='undefined'&&VIDSTILL.has(f))?'<span class="vs">Video still · motion not shown</span>':''}</button>`).join('')+'</div>':''}
+function figs(list,id,lettered){return list.length?'<div class="figs">'+list.map((f,i)=>{const v=(typeof VIDMAP!=='undefined')&&VIDMAP[f];const lab=`<span>${lettered?'Option '+LT[i]:(v?'Video ':'Fig ')+(i+1)}</span>`;if(v)return `<button class="fig vid" data-vid="${v}"><video src="${v}" poster="${f}" autoplay loop muted playsinline preload="auto" aria-label="Video ${i+1} for question ${id}"></video>${lab}<span class="vs ok">▶ Video loop</span></button>`;return `<button class="fig" data-src="${f}"><img src="${f}" loading="lazy" alt="Figure ${i+1} for question ${id}">${lab}${(typeof VIDSTILL!=='undefined'&&VIDSTILL.has(f))?'<span class="vs">Video still · motion not shown</span>':''}</button>`}).join('')+'</div>':''}
 function renderQ(){
   const x=sess.list[sess.idx],T=TOPIC[x.t],a=sess.ans[x.id],reveal=(sess.mode==='tutor'&&a!==undefined)||sess.done,last=sess.idx===sess.list.length-1;
   const answered=Object.keys(sess.ans).length;
   let h=`<div class="card"><div class="qtop"><div class="tags"><span class="tag">${esc(T.n)}</span><span class="tag n">#${x.tn} of ${TN[x.t]}</span><span class="tag d${x.d}">${['','Easy','Medium','Hard'][x.d]}</span>${x.img?'<span class="tag n">Figure</span>':''}${x.upd?'<span class="tag upd">✎ Updated Oct 2026</span>':''}</div>
    <div class="actions" style="gap:10px">${sess.mode==='exam'&&!sess.done?'<span class="timer" id="timer"></span>':''}<span class="qno">Q${sess.idx+1}/${sess.list.length}</span></div></div>
    <div class="prog" aria-hidden="true"><i style="width:${100*answered/sess.list.length}%"></i></div>
-   <p class="stem">${esc(x.stem)}</p>${figs(x.fq,x.id,OPTFIG.has(x.id))}${(typeof CLIP!=='undefined'&&CLIP[x.id]&&CLIP[x.id].q)?`<div class="clip"><b>What the video clip shows</b>${esc(CLIP[x.id].q)}</div>`:''}
+   <p class="stem">${esc(x.stem)}</p>${figs(x.fq,x.id,OPTFIG.has(x.id))}${(typeof CLIP!=='undefined'&&CLIP[x.id]&&CLIP[x.id].q&&!(x.fq.length&&typeof VIDMAP!=='undefined'&&x.fq.every(f=>VIDMAP[f])))?`<div class="clip"><b>What the video clip shows</b>${esc(CLIP[x.id].q)}</div>`:''}
    <div class="opts" role="group" aria-label="Answer options">`;
   x.opts.forEach((o,i)=>{let c='opt';if(reveal){if(i===x.ans)c+=' right';else if(i===a)c+=' wrong'}else if(i===a)c+=' sel';
     h+=`<button class="${c}" data-i="${i}" ${reveal?'disabled':''}><span class="k">${LT[i]}</span><span>${esc(o)}</span></button>`});
@@ -294,7 +294,7 @@ function renderQ(){
   h+='<div class="pal" aria-label="Question navigator">'+sess.list.map((q,i)=>{let c='';const aa=sess.ans[q.id];if(aa!==undefined)c=(sess.mode==='tutor'||sess.done)?(aa===q.ans?'ok':'no'):'a';if(i===sess.idx)c+=' cur';if(S.flags[q.id])c+=' f';return `<button class="${c}" data-j="${i}" aria-label="Question ${i+1}">${i+1}</button>`}).join('')+'</div></div>';
   $('app').innerHTML=h;
   $('app').querySelectorAll('.opt').forEach(b=>b.onclick=()=>choose(+b.dataset.i));
-  $('app').querySelectorAll('.fig').forEach(b=>b.onclick=()=>{$('lbImg').src=b.dataset.src;$('lb').hidden=false});
+  $('app').querySelectorAll('.fig').forEach(b=>b.onclick=()=>{const v=b.dataset.vid;$('lbImg').hidden=!!v;$('lbVid').hidden=!v;if(v){$('lbVid').src=v;$('lbVid').play().catch(()=>{})}else{$('lbVid').pause();$('lbImg').src=b.dataset.src}$('lb').hidden=false});
   $('app').querySelectorAll('.pal button').forEach(b=>b.onclick=()=>{sess.idx=+b.dataset.j;renderQ()});
   $('prev').onclick=()=>{sess.idx--;renderQ()};
   $('next').onclick=()=>{if(last){if(!sess.done)finish()}else{sess.idx++;renderQ();window.scrollTo(0,0)}};
@@ -325,7 +325,7 @@ function applyTheme(t){if(t)document.documentElement.setAttribute('data-theme',t
 let th=null;try{th=localStorage.getItem('cce_theme')}catch(e){}applyTheme(th);
 $('theme').onclick=()=>{const cur=document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');const nx=cur==='dark'?'light':'dark';applyTheme(nx);try{localStorage.setItem('cce_theme',nx)}catch(e){}};
 $('home').onclick=()=>{if(sess&&!sess.done&&Object.keys(sess.ans).length&&!confirm('Leave this session? Answers already recorded are kept.'))return;home()};
-$('lb').onclick=()=>{$('lb').hidden=true};
+$('lb').onclick=e=>{if(e.target.id==='lbVid')return;$('lb').hidden=true;$('lbVid').pause()};
 document.addEventListener('keydown',e=>{
   if(!$('lb').hidden){if(e.key==='Escape')$('lb').hidden=true;return}
   if(!sess||!$('next')||e.target.tagName==='SELECT'||e.target.tagName==='INPUT')return;
