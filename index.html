@@ -132,9 +132,9 @@ td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-
 .lb img{max-width:100%;max-height:92vh;border-radius:8px}
 /* ticker */
 .ticker{position:fixed;left:0;right:0;bottom:0;height:34px;background:#071120;border-top:1px solid #1e3556;overflow:hidden;z-index:40;display:flex;align-items:center}
-.ticker .tr{display:flex;white-space:nowrap;animation:tk 90s linear infinite;will-change:transform}
-.ticker span{color:#7dd3fc;font:600 .8rem var(--f);letter-spacing:.06em;padding-right:48px}
-.ticker b{color:#22d3ee}
+.ticker .tr{display:flex;justify-content:center;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ticker span{color:#7dd3fc;font:600 .8rem var(--f);letter-spacing:.04em;padding:0 10px;overflow:hidden;text-overflow:ellipsis}
+.ticker b{color:#22d3ee}.ticker i{font-style:normal}@media (max-width:700px){.ticker .tkx{display:none}.ticker span{font-size:.74rem}}
 @keyframes tk{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.ticker .tr{animation:none}}
 [hidden]{display:none!important}
@@ -336,7 +336,7 @@ document.addEventListener('keydown',e=>{
   else if(k==='F')$('flag').click();
 });
 /* ticker */
-(function(){const t=`<span><b>ICU O.Dakka</b> · CCEeXAM Simulator · Osama Hosni Abdelhady Dakka · Critical Care Medicine · ${Q.length} Questions</span>`;$('tk').innerHTML=t.repeat(4)+t.repeat(4)})();
+(function(){const t=`<span><b>ICU O.Dakka</b><i class="tkx"> · CCEeXAM Simulator</i> · Osama Hosni Abdelhady Dakka<i class="tkx"> · Critical Care Medicine · ${Q.length} Questions</i></span>`;$('tk').innerHTML=t})();
 /* PWA */
 if('serviceWorker' in navigator&&location.protocol==='https:'&&!/claude/.test(location.hostname)){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
 home();
