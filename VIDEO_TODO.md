@@ -4,3 +4,4 @@
 - Encoding: libx264 crf26 preset medium, max width 800, faststart, no audio, -fps_mode vfr (one source declares 1,000,000 fps and explodes without it).
 - No clip exists for P68_q2 (best match 0.69, wrong image) -> stays a still.
 - T14_q1 and T20_q1 (post-test) have no match among the Practice videos either; they remain stills.
+- NEXT: write CLIP text for 8 sections that now have video but no description: P14.q P51.q P65.q P70.q P105.q P118.q P157.q P52.e (same style as existing CLIP entries in vid.js; bump SW).
