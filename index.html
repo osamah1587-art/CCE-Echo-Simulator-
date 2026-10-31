@@ -6,7 +6,7 @@
 <title>CCEeXAM Simulator</title>
 <meta name="description" content="NBE CCEeXAM practice simulator built from the SCCM Critical Care Echocardiography Review course">
 <meta name="theme-color" content="#0a1628">
-<link rel="manifest" href="manifest.json?v=4">
+<link rel="manifest" href="manifest.json">
 <link rel="icon" href="echo-icon-192.png">
 <link rel="apple-touch-icon" href="echo-icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -158,7 +158,6 @@ td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-
 <div class="lb" id="lb" hidden role="dialog" aria-label="Enlarged figure"><img id="lbImg" alt="Enlarged figure"></div>
 <div class="ticker" aria-hidden="true"><div class="tr" id="tk"></div></div>
 <script src="data.js"></script>
-<script src="images.js"></script>
 <script>
 const LT='ABCDE';
 const BP=[
@@ -169,7 +168,8 @@ const BP=[
 const TOPIC={};BP.forEach((d,di)=>d.topics.forEach(([k,n],ti)=>TOPIC[k]={k,n,d,order:di*10+ti}));
 Q.forEach((x,i)=>{
   x.i=i;
-  if(x.bk){x.id='B'+x.bk+'_'+x.n;x.fq=[];x.fe=[];x.img=0}
+  if(x.bimg){x.id='X'+x.n;x.fq=[x.bimg];x.fe=[];x.img=1}
+  else if(x.bk){x.id='B'+x.bk+'_'+x.n;x.fq=[];x.fe=[];x.img=0}
   else if(x.lec){x.id='L'+x.lec+'_'+x.n;x.fq=[];x.fe=[];x.img=0}
   else{x.id=(x.src==='Practice'?'P':'T')+x.n;x.d=2;const m=IMG[(x.src==='Practice'?'P':'T')+x.n]||{q:[],e:[]};x.fq=m.q;x.fe=m.e;x.img=m.q.length?1:0}
 });
