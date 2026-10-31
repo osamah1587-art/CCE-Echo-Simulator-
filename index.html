@@ -106,6 +106,7 @@ select{font:inherit;font-size:.9rem;background:var(--card2);color:var(--fg);bord
 .focus h3{margin:0 0 6px;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
 .focus .v{font-weight:800;margin-bottom:4px}.v.ok{color:var(--ok)}.v.no{color:var(--bad)}
 .focus p{margin:0}
+.tl{display:grid;gap:8px;margin:10px 0 4px}.tl div{display:grid;grid-template-columns:26px minmax(0,1fr);gap:8px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px}.tl i{font-style:normal;font-size:1rem;line-height:1.4;text-align:center}.tl b{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);margin-bottom:1px}.tl span{font-size:.92rem}.tl .trap b{color:var(--warn)}.tl .trap{border-color:var(--warn);background:var(--warn-bg)}.ans{font-weight:700;margin:2px 0 0}.notes{margin-top:8px;font-size:.88rem;color:var(--muted)}.notes b{color:var(--fg)}
 .nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
 .nav .actions{gap:8px}
 .timer{font:700 .9rem var(--mono);color:var(--warn)}
@@ -158,6 +159,7 @@ td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-
 <div class="lb" id="lb" hidden role="dialog" aria-label="Enlarged figure"><img id="lbImg" alt="Enlarged figure"></div>
 <div class="ticker" aria-hidden="true"><div class="tr" id="tk"></div></div>
 <script src="data.js"></script>
+<script src="teach.js"></script>
 <script>
 const LT='ABCDE';
 const BP=[
@@ -284,7 +286,7 @@ function renderQ(){
   x.opts.forEach((o,i)=>{let c='opt';if(reveal){if(i===x.ans)c+=' right';else if(i===a)c+=' wrong'}else if(i===a)c+=' sel';
     h+=`<button class="${c}" data-i="${i}" ${reveal?'disabled':''}><span class="k">${LT[i]}</span><span>${esc(o)}</span></button>`});
   h+='</div>';
-  if(reveal){const ok=a===x.ans;h+=`<div class="focus"><h3>Focus</h3><div class="v ${a===undefined?'':ok?'ok':'no'}">${a===undefined?'Not answered':ok?'Correct':'Incorrect'} · Answer ${LT[x.ans]}${ok&&sess.mode==='tutor'&&S.streak>=3?` <span class="streakpop">· ${S.streak} in a row</span>`:''}</div><p>${esc(x.exp)}</p>${x.upd?'<div class="updnote">✎ This question was reviewed and corrected in Oct 2026 against current ASE/EACVI guidance.</div>':''}${figs(x.fe,x.id,false).replace('class="figs"','class="figs" style="margin:12px 0 0"')}</div>`}
+  if(reveal){const ok=a===x.ans;h+=`<div class="focus"><h3>Focus</h3><div class="v ${a===undefined?'':ok?'ok':'no'}">${a===undefined?'Not answered':ok?'Correct':'Incorrect'} · Answer ${LT[x.ans]}${ok&&sess.mode==='tutor'&&S.streak>=3?` <span class="streakpop">· ${S.streak} in a row</span>`:''}</div>${(()=>{const t=(typeof TEACH!=='undefined'&&TEACH[x.id])||null;const ans=`<p class="ans">Correct answer: ${LT[x.ans]} — ${esc(x.opts[x.ans])}</p>`;if(!t)return ans+`<p>${esc(x.exp)}</p>`;const row=(ic,lb,v,c)=>v?`<div class="${c||''}"><i>${ic}</i><span><b>${lb}</b>${esc(v)}</span></div>`:'';return ans+`<div class="tl">${row('◎','Key clue',t.clue)}${row('⟳','Mechanism',t.mech)}${row('✓','Confirmation',t.confirm)}${row('!','Exam trap',t.trap,'trap')}</div><p class="notes"><b>Notes: </b>${esc(x.exp)}</p>`})()}${x.upd?'<div class="updnote">✎ This question was reviewed and corrected in Oct 2026 against current ASE/EACVI guidance.</div>':''}${figs(x.fe,x.id,false).replace('class="figs"','class="figs" style="margin:12px 0 0"')}</div>`}
   h+=`<div class="nav"><div class="actions"><button class="btn" id="prev" ${sess.idx?'':'disabled'}>← Prev</button><button class="btn" id="flag" aria-pressed="${!!S.flags[x.id]}">${S.flags[x.id]?'Flagged':'Flag'}</button></div>
    <div class="actions">${sess.done?'<button class="btn" id="toRes">Results</button>':'<button class="btn" id="end">End</button>'}<button class="btn pri" id="next" ${last&&sess.done?'disabled':''}>${last?(sess.done?'Last':'Finish'):'Next →'}</button></div></div>`;
   h+='<div class="pal" aria-label="Question navigator">'+sess.list.map((q,i)=>{let c='';const aa=sess.ans[q.id];if(aa!==undefined)c=(sess.mode==='tutor'||sess.done)?(aa===q.ans?'ok':'no'):'a';if(i===sess.idx)c+=' cur';if(S.flags[q.id])c+=' f';return `<button class="${c}" data-j="${i}" aria-label="Question ${i+1}">${i+1}</button>`}).join('')+'</div></div>';
