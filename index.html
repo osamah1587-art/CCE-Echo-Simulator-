@@ -88,6 +88,7 @@ select{font:inherit;font-size:.9rem;background:var(--card2);color:var(--fg);bord
 .qno{font:700 .85rem var(--mono);background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:4px 10px;white-space:nowrap}
 .prog{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:14px}
 .prog i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.fig .vs{left:auto;right:6px;top:6px;bottom:auto;background:#b45309}.clip{margin:0 0 14px;padding:10px 12px;border:1px dashed var(--accent);border-radius:10px;background:var(--glow);font-size:.92rem}.clip b{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);margin-bottom:2px}
 .tag.upd{background:#f59e0b;color:#1f2937;font-weight:700}.updnote{margin-top:10px;padding:8px 10px;border-left:3px solid #f59e0b;background:rgba(245,158,11,.12);border-radius:6px;font-size:.85rem}
 .stem{font-size:1.05rem;font-weight:500;margin:0 0 14px;line-height:1.6}
 .figs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:0 0 14px}
@@ -160,6 +161,7 @@ td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-
 <div class="ticker" aria-hidden="true"><div class="tr" id="tk"></div></div>
 <script src="data.js"></script>
 <script src="teach.js"></script>
+<script src="vid.js"></script>
 <script>
 const LT='ABCDE';
 const BP=[
@@ -274,19 +276,19 @@ function choose(a){
   else{if(sess.done)return;sess.ans[x.id]=a}
   renderQ();
 }
-function figs(list,id,lettered){return list.length?'<div class="figs">'+list.map((f,i)=>`<button class="fig" data-src="${f}"><img src="${f}" loading="lazy" alt="Figure ${i+1} for question ${id}"><span>${lettered?'Option '+LT[i]:'Fig '+(i+1)}</span></button>`).join('')+'</div>':''}
+function figs(list,id,lettered){return list.length?'<div class="figs">'+list.map((f,i)=>`<button class="fig" data-src="${f}"><img src="${f}" loading="lazy" alt="Figure ${i+1} for question ${id}"><span>${lettered?'Option '+LT[i]:'Fig '+(i+1)}</span>${(typeof VIDSTILL!=='undefined'&&VIDSTILL.has(f))?'<span class="vs">Video still · motion not shown</span>':''}</button>`).join('')+'</div>':''}
 function renderQ(){
   const x=sess.list[sess.idx],T=TOPIC[x.t],a=sess.ans[x.id],reveal=(sess.mode==='tutor'&&a!==undefined)||sess.done,last=sess.idx===sess.list.length-1;
   const answered=Object.keys(sess.ans).length;
   let h=`<div class="card"><div class="qtop"><div class="tags"><span class="tag">${esc(T.n)}</span><span class="tag n">#${x.tn} of ${TN[x.t]}</span><span class="tag d${x.d}">${['','Easy','Medium','Hard'][x.d]}</span>${x.img?'<span class="tag n">Figure</span>':''}${x.upd?'<span class="tag upd">✎ Updated Oct 2026</span>':''}</div>
    <div class="actions" style="gap:10px">${sess.mode==='exam'&&!sess.done?'<span class="timer" id="timer"></span>':''}<span class="qno">Q${sess.idx+1}/${sess.list.length}</span></div></div>
    <div class="prog" aria-hidden="true"><i style="width:${100*answered/sess.list.length}%"></i></div>
-   <p class="stem">${esc(x.stem)}</p>${figs(x.fq,x.id,OPTFIG.has(x.id))}
+   <p class="stem">${esc(x.stem)}</p>${figs(x.fq,x.id,OPTFIG.has(x.id))}${(typeof CLIP!=='undefined'&&CLIP[x.id]&&CLIP[x.id].q)?`<div class="clip"><b>What the video clip shows</b>${esc(CLIP[x.id].q)}</div>`:''}
    <div class="opts" role="group" aria-label="Answer options">`;
   x.opts.forEach((o,i)=>{let c='opt';if(reveal){if(i===x.ans)c+=' right';else if(i===a)c+=' wrong'}else if(i===a)c+=' sel';
     h+=`<button class="${c}" data-i="${i}" ${reveal?'disabled':''}><span class="k">${LT[i]}</span><span>${esc(o)}</span></button>`});
   h+='</div>';
-  if(reveal){const ok=a===x.ans;h+=`<div class="focus"><h3>Focus</h3><div class="v ${a===undefined?'':ok?'ok':'no'}">${a===undefined?'Not answered':ok?'Correct':'Incorrect'} · Answer ${LT[x.ans]}${ok&&sess.mode==='tutor'&&S.streak>=3?` <span class="streakpop">· ${S.streak} in a row</span>`:''}</div>${(()=>{const t=(typeof TEACH!=='undefined'&&TEACH[x.id])||null;const ans=`<p class="ans">Correct answer: ${LT[x.ans]} — ${esc(x.opts[x.ans])}</p>`;if(!t)return ans+`<p>${esc(x.exp)}</p>`;const row=(ic,lb,v,c)=>v?`<div class="${c||''}"><i>${ic}</i><span><b>${lb}</b>${esc(v)}</span></div>`:'';return ans+`<div class="tl">${row('◎','Key clue',t.clue)}${row('⟳','Mechanism',t.mech)}${row('✓','Confirmation',t.confirm)}${row('!','Exam trap',t.trap,'trap')}</div><p class="notes"><b>Notes: </b>${esc(x.exp)}</p>`})()}${x.upd?'<div class="updnote">✎ This question was reviewed and corrected in Oct 2026 against current ASE/EACVI guidance.</div>':''}${figs(x.fe,x.id,false).replace('class="figs"','class="figs" style="margin:12px 0 0"')}</div>`}
+  if(reveal){const ok=a===x.ans;h+=`<div class="focus"><h3>Focus</h3><div class="v ${a===undefined?'':ok?'ok':'no'}">${a===undefined?'Not answered':ok?'Correct':'Incorrect'} · Answer ${LT[x.ans]}${ok&&sess.mode==='tutor'&&S.streak>=3?` <span class="streakpop">· ${S.streak} in a row</span>`:''}</div>${(()=>{const t=(typeof TEACH!=='undefined'&&TEACH[x.id])||null;const ans=`<p class="ans">Correct answer: ${LT[x.ans]} — ${esc(x.opts[x.ans])}</p>`;if(!t)return ans+`<p>${esc(x.exp)}</p>`;const row=(ic,lb,v,c)=>v?`<div class="${c||''}"><i>${ic}</i><span><b>${lb}</b>${esc(v)}</span></div>`:'';return ans+`<div class="tl">${row('◎','Key clue',t.clue)}${row('⟳','Mechanism',t.mech)}${row('✓','Confirmation',t.confirm)}${row('!','Exam trap',t.trap,'trap')}</div><p class="notes"><b>Notes: </b>${esc(x.exp)}</p>`})()}${x.upd?'<div class="updnote">✎ This question was reviewed and corrected in Oct 2026 against current ASE/EACVI guidance.</div>':''}${(typeof CLIP!=='undefined'&&CLIP[x.id]&&CLIP[x.id].e)?`<div class="clip" style="margin:12px 0 0"><b>Explanation clip shows</b>${esc(CLIP[x.id].e)}</div>`:''}${figs(x.fe,x.id,false).replace('class="figs"','class="figs" style="margin:12px 0 0"')}</div>`}
   h+=`<div class="nav"><div class="actions"><button class="btn" id="prev" ${sess.idx?'':'disabled'}>← Prev</button><button class="btn" id="flag" aria-pressed="${!!S.flags[x.id]}">${S.flags[x.id]?'Flagged':'Flag'}</button></div>
    <div class="actions">${sess.done?'<button class="btn" id="toRes">Results</button>':'<button class="btn" id="end">End</button>'}<button class="btn pri" id="next" ${last&&sess.done?'disabled':''}>${last?(sess.done?'Last':'Finish'):'Next →'}</button></div></div>`;
   h+='<div class="pal" aria-label="Question navigator">'+sess.list.map((q,i)=>{let c='';const aa=sess.ans[q.id];if(aa!==undefined)c=(sess.mode==='tutor'||sess.done)?(aa===q.ans?'ok':'no'):'a';if(i===sess.idx)c+=' cur';if(S.flags[q.id])c+=' f';return `<button class="${c}" data-j="${i}" aria-label="Question ${i+1}">${i+1}</button>`}).join('')+'</div></div>';
