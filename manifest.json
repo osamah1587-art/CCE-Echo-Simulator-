@@ -19,12 +19,12 @@
    "purpose": "any"
   },
   {
-   "src": "echo-icon-512.png",
+   "src": "echo-icon-maskable-512.png",
    "sizes": "512x512",
    "type": "image/png",
    "purpose": "maskable"
   }
  ],
  "scope": "./",
- "description": "NBE CCEeXAM practice simulator \u00b7 ICU O.Dakka"
+ "description": "NBE CCEeXAM practice simulator · ICU O.Dakka"
 }

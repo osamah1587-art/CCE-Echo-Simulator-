@@ -6,9 +6,9 @@
 <title>CCEeXAM Simulator</title>
 <meta name="description" content="NBE CCEeXAM practice simulator built from the SCCM Critical Care Echocardiography Review course">
 <meta name="theme-color" content="#0a1628">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json?v=5">
 <link rel="icon" href="echo-icon-192.png">
-<link rel="apple-touch-icon" href="echo-icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
@@ -36,7 +36,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 /* header */
 .hd{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .brand{display:flex;align-items:center;gap:12px;min-width:0}
-.logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#0e4f7a);display:grid;place-items:center;color:#fff;font:800 15px/1 var(--f);letter-spacing:-.02em;flex:none}
+.logo{width:44px;height:44px;border-radius:12px;object-fit:cover;box-shadow:0 2px 10px rgba(37,99,235,.35);background:linear-gradient(135deg,var(--accent),#0e4f7a);display:grid;place-items:center;color:#fff;font:800 15px/1 var(--f);letter-spacing:-.02em;flex:none}
 .brand h1{font-size:1.15rem;line-height:1.15;margin:0;font-weight:800;letter-spacing:-.01em}
 .brand p{margin:2px 0 0;font-size:.8rem;color:var(--muted)}
 .hd .actions{flex-wrap:nowrap}
@@ -141,7 +141,7 @@ td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-
 <body>
 <div class="w">
   <header class="hd">
-    <div class="brand"><div class="logo" aria-hidden="true">O.D</div><div><h1>CCEeXAM Simulator</h1><p>ICU O.Dakka · NBE blueprint · SCCM Review 2024</p></div></div>
+    <div class="brand"><img class="logo" src="logo-96.png" alt="" aria-hidden="true"><div><h1>CCEeXAM Simulator</h1><p>ICU O.Dakka · NBE blueprint · SCCM Review 2024</p></div></div>
     <div class="actions" style="gap:8px">
       <button class="icon-btn" id="home" aria-label="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></button>
       <button class="icon-btn" id="theme" aria-label="Toggle dark or light theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
