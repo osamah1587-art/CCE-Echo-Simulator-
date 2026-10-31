@@ -165,9 +165,9 @@ td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-
 <script>
 const LT='ABCDE';
 const BP=[
- {id:'D1',name:'TTE & TEE',w:'50%',topics:[['views','Views & image acquisition'],['lv','LV systolic function & wall motion'],['dia','LV diastolic function'],['rv','RV & pulmonary pressures'],['valve','Valves & prostheses'],['peri','Pericardial disease'],['mass','Masses, aorta, shunts & devices']]},
- {id:'D2',name:'Physics',w:'25%',topics:[['phys','Ultrasound principles & instrumentation'],['dop','Doppler principles'],['art','Artifacts']]},
- {id:'D3',name:'Other applications',w:'25%',topics:[['hemo','Hemodynamics & cardiac output'],['fluid','Preload & fluid responsiveness'],['shock','Shock & cardiac arrest'],['lung','Lung & pleural ultrasound'],['vasc','Vascular, DVT & procedures'],['abd','FAST, abdomen & trauma']]}
+ {id:'D1',name:'TTE & TEE',w:'~50%',topics:[['views','Views & image acquisition'],['lv','LV systolic function & wall motion'],['dia','LV diastolic function'],['rv','RV & pulmonary pressures'],['valve','Valves & prostheses'],['peri','Pericardial disease'],['mass','Masses, aorta, shunts & devices']]},
+ {id:'D2',name:'Physics',w:'~25%',topics:[['phys','Ultrasound principles & instrumentation'],['dop','Doppler principles'],['art','Artifacts']]},
+ {id:'D3',name:'Other applications',w:'~25%',topics:[['hemo','Hemodynamics & cardiac output'],['fluid','Preload & fluid responsiveness'],['shock','Shock & cardiac arrest'],['lung','Lung & pleural ultrasound'],['vasc','Vascular, DVT & procedures'],['abd','FAST, abdomen & trauma']]}
 ];
 const TOPIC={};BP.forEach((d,di)=>d.topics.forEach(([k,n],ti)=>TOPIC[k]={k,n,d,order:di*10+ti}));
 Q.forEach((x,i)=>{
@@ -240,7 +240,7 @@ function home(){
   </div>
   ${weak.length?'':'<p class="note" style="margin:8px 0 0">Weak topics unlock after 3+ answers in a topic with accuracy under 70%.</p>'}
   </div>
-  <div class="card" style="margin-top:14px"><h2>Topics · NBE blueprint</h2><p class="note" style="margin:-4px 0 12px">Tap <b>Start</b> to practise one topic (uses the session settings below). Tick topics to build a mixed session.</p>`;
+  <div class="card" style="margin-top:14px"><h2>Topics · NBE content areas</h2><p class="note" style="margin:-4px 0 12px">Tap <b>Start</b> to practise one topic (uses the session settings below). Tick topics to build a mixed session. Percentages are a common prep-course split; the official NBE outline gives no weights.</p>`;
   BP.forEach(d=>{
     h+=`<div class="dom"><button class="domh" data-dom="${d.id}"><strong>${d.id.slice(1)}. ${esc(d.name)}</strong><span class="wt">${d.w}</span></button>`;
     d.topics.forEach(([k,nm])=>{const s=topicStat(k),g=s.n?100*s.ok/s.n:0,r=s.n?100*(s.att-s.ok)/s.n:0,lv=tLevel(s);
